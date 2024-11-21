@@ -1,5 +1,5 @@
 class job:
-    def __init__(self, id, arrival_time, burst_time, priority):
+    def __init__(self, id, arrival_time, burst_type, burst_time, priority):
         """
         Initializes a job with its id, arrival time, burst time, and priority
         :param id: Unique identifier for job
@@ -9,6 +9,7 @@ class job:
         """
         self.id = id
         self.arrival_time = arrival_time
+        self.burst_type = burst_type
         self.burst_time = burst_time
         self.priority = priority
         self.wait_time = 0
