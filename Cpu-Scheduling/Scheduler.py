@@ -16,8 +16,8 @@ from rich.align import Align
 def getConfig(client_id):
     return {
         "client_id": client_id,
-        "min_jobs": 3,
-        "max_jobs": 4,
+        "min_jobs": 10,
+        "max_jobs": 10,
         "min_bursts": 3,
         "max_bursts": 3,
         "min_job_interval": 2,
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     clock = start_clock   
     
     
-    with Live(layout, console=console, refresh_per_second=2000, vertical_overflow="visible") as live:
+    with Live(layout, console=console, refresh_per_second=1750, vertical_overflow="visible") as live:
                 
         # region Setting up the tables to display the objects
         with beat(1):
