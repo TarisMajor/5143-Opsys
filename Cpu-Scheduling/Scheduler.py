@@ -16,17 +16,17 @@ from rich.align import Align
 def getConfig(client_id):
     return {
         "client_id": client_id,
-        "min_jobs": 5,
-        "max_jobs": 6,
+        "min_jobs": 3,
+        "max_jobs": 4,
         "min_bursts": 3,
         "max_bursts": 3,
         "min_job_interval": 2,
         "max_job_interval": 5,
         "burst_type_ratio": 0.7,
-        "min_cpu_burst_interval": 3,
-        "max_cpu_burst_interval": 5,
-        "min_io_burst_interval": 3,
-        "max_io_burst_interval": 5,
+        "min_cpu_burst_interval": 13,
+        "max_cpu_burst_interval": 15,
+        "min_io_burst_interval": 13,
+        "max_io_burst_interval": 15,
         "min_ts_interval": 1,
         "max_ts_interval": 1,
         "priority_levels": [1, 2, 3, 4, 5]
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     clock = start_clock   
     
     
-    with Live(layout, console=console, refresh_per_second=60, vertical_overflow="visible") as live:
+    with Live(layout, console=console, refresh_per_second=2000, vertical_overflow="visible") as live:
                 
         # region Setting up the tables to display the objects
         with beat(1):
@@ -328,19 +328,19 @@ if __name__ == "__main__":
                     if len(FCFS_Running) < Num_CPUs:
                         FCFS_Running.append(job)
                         with beat(5):
-                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time())," ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " "])
+                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time())," ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " "])
                         FCFS_ReadyQueue.remove(job)
                         
                     else:
                         job.increment_wait_time()
                         with beat(5):
-                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time())," ",f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " ", " "])
+                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time())," ",f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " ", " "])
                         
             for job in FCFS_Running:
                 if job.get_burst_type() == "IO":
                     FCFS_WaitingQueue.append(job)
                     with beat(5):
-                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " "])
                     FCFS_Running.remove(job)
                     continue
                 
@@ -349,7 +349,7 @@ if __name__ == "__main__":
                         job.get_next_burst()
                         FCFS_WaitingQueue.append(job)
                         with beat(5):
-                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " "])
                     
                         FCFS_Running.remove(job)
                         continue
@@ -357,13 +357,13 @@ if __name__ == "__main__":
                     else:
                         job.decrement_burst_time()
                         with beat(5):
-                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " "])
+                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " "])
                     
                         if job.get_burst_time() == 0:
                             job.get_next_burst()
                             FCFS_WaitingQueue.append(job)
                             with beat(5):
-                                update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                                update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " "])
                     
                             FCFS_Running.remove(job)
                             continue
@@ -372,7 +372,7 @@ if __name__ == "__main__":
                     job.set_exit_time(clock)
                     FCFS_FinishedQueue.append(job)
                     with beat(5):
-                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", str(job.get_exit_time())])
+                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", str(job.get_exit_time())])
                     FCFS_Running.remove(job)
                                 
             for job in FCFS_WaitingQueue:
@@ -380,17 +380,17 @@ if __name__ == "__main__":
                     if len(FCFS_IO_Queue) == 0:
                         FCFS_IO_Queue.append(job)
                         with beat(5):
-                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " "])
+                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " "])
                         FCFS_WaitingQueue.remove(job)
                     else:
                         job.increment_wait_time()
                         with beat(5):
-                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                            update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " "])
                 
                 else:
                     FCFS_ReadyQueue.append(job)
                     with beat(5):
-                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ",f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " ", " "])
+                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ",f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " ", " "])
                     FCFS_WaitingQueue.remove(job)
             
             for job in FCFS_IO_Queue:
@@ -399,18 +399,18 @@ if __name__ == "__main__":
                     job.get_next_burst()
                     FCFS_ReadyQueue.append(job)
                     with beat(5):
-                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " ", " "])
+                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " ", " "])
                     FCFS_IO_Queue.remove(job)
                     
                 else:
                     job.decrement_burst_time()
                     with beat(5):
-                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " "])
+                        update_row(table1, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " "])
                     if job.get_burst_time() == 0:
                         job.get_next_burst()
                         FCFS_ReadyQueue.append(job)
                         with beat(5):
-                            update_row(table1, job.get_id()-1, [str(job.get_arrival_time()), " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " ", " "])
+                            update_row(table1, job.get_id()-1, [str(job.get_arrival_time()), " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " ", " "])
                         FCFS_IO_Queue.remove(job)
             #endregion
             
@@ -429,7 +429,7 @@ if __name__ == "__main__":
                     if len(PB_Running) < Num_CPUs:
                         PB_Running.append(job)
                         with beat(5):
-                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " "])
+                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}", " ", " ", " ", " "])
                         PB_ReadyQueue.remove(job)
                     
                     else:
@@ -438,11 +438,11 @@ if __name__ == "__main__":
                             if PB_job.get_priority() > job.get_priority():
                                 PB_Running.append(job)
                                 with beat(1):
-                                    update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " "])
+                                    update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}", " ", " ", " ", " "])
                                 PB_ReadyQueue.remove(job)
                                 PB_WaitingQueue.append(PB_job)
                                 with beat(1):
-                                    update_row(table2, (PB_job.get_id()-1), [str(PB_job.get_arrival_time()), " ", " ", "" ,f"J{PB_job.get_id()}, Burst: {PB_job.get_burst_type()}", " ", " ", " "])
+                                    update_row(table2, (PB_job.get_id()-1), [str(PB_job.get_arrival_time()), " ", " ", "" ,f"J{PB_job.get_id()}, BT: {PB_job.get_burst_type()}", " ", " ", " "])
                                 PB_Running.remove(PB_job)
                         
                             else:
@@ -452,7 +452,7 @@ if __name__ == "__main__":
                 if job.get_burst_type() == "IO":
                     PB_WaitingQueue.append(job)
                     with beat(5):
-                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}", " ", " ", " "])
                     PB_Running.remove(job)
                     continue
                 
@@ -461,19 +461,19 @@ if __name__ == "__main__":
                         job.get_next_burst()
                         PB_WaitingQueue.append(job)
                         with beat(5):
-                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}", " ", " ", " "])
                         PB_Running.remove(job)
                         continue
                         
                     else:
                         job.decrement_burst_time()
                         with beat(5):
-                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " "])
+                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}", " ", " ", " ", " "])
                         if job.get_burst_time() == 0:
                             job.get_next_burst()
                             PB_WaitingQueue.append(job)
                             with beat(5):
-                                update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                                update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}", " ", " ", " "])
                             PB_Running.remove(job)
                             continue
                         
@@ -481,7 +481,7 @@ if __name__ == "__main__":
                     job.set_exit_time(clock)
                     PB_FinishedQueue.append(job)
                     with beat(5):
-                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", str(job.get_exit_time())])
+                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}", str(job.get_exit_time())])
                     PB_Running.remove(job)
                  
             for job in PB_WaitingQueue:
@@ -489,7 +489,7 @@ if __name__ == "__main__":
                     if len(PB_IO_Queue) == 0:
                         PB_IO_Queue.append(job)
                         with beat(5):
-                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " "])
+                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}", " ", " "])
                         PB_WaitingQueue.remove(job)
                     else:
                         job.increment_wait_time()
@@ -497,7 +497,7 @@ if __name__ == "__main__":
                 else:
                     PB_ReadyQueue.append(job)
                     with beat(5):
-                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}"," ", " ", " ", " ", " "])
+                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}"," ", " ", " ", " ", " "])
                     PB_WaitingQueue.remove(job)
             
                 
@@ -506,18 +506,18 @@ if __name__ == "__main__":
                     job.get_next_burst()
                     PB_ReadyQueue.append(job)
                     with beat(5):
-                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}"," ", " ", " ", " ", " "])
+                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}"," ", " ", " ", " ", " "])
                     PB_IO_Queue.remove(job)
                     
                 else:
                     job.decrement_burst_time()
                     with beat(5):
-                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " "])
+                        update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}", " ", " "])
                     if job.get_burst_time() == 0:
                         job.get_next_burst()
                         PB_ReadyQueue.append(job)
                         with beat(5):
-                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}"," ", " ", " ", " ", " "])
+                            update_row(table2, (job.get_id()-1), [str(job.get_arrival_time()), " " ,f"J{job.get_id()} BT: {job.get_burst_type()} P: {job.get_priority()}"," ", " ", " ", " ", " "])
                         PB_IO_Queue.remove(job)
             #endregion
             """
@@ -529,7 +529,7 @@ if __name__ == "__main__":
                     if len(RR_Running) < Num_CPUs:
                         RR_Running.append(job)
                         with beat(5):
-                            update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " " ,f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " "])
+                            update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " " ,f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " "])
                         RR_ReadyQueue.remove(job)
                         
                     else:
@@ -539,7 +539,7 @@ if __name__ == "__main__":
                 if job.get_burst_type() == "IO":
                     RR_WaitingQueue.append(job)
                     with beat(5):
-                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " "])
                     RR_Running.remove(job)
                     continue
                 
@@ -550,7 +550,7 @@ if __name__ == "__main__":
                             job.reset_cpu_time()
                             RR_WaitingQueue.append(job)
                             with beat(5):
-                                update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                                update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " "])
                             RR_Running.remove(job)
                             continue
                             
@@ -562,21 +562,21 @@ if __name__ == "__main__":
                                 job.reset_cpu_time()
                                 RR_WaitingQueue.append(job)
                                 with beat(5):
-                                    update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])
+                                    update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " "])
                                 RR_Running.remove(job)
                                 continue
                     else:
                         job.reset_cpu_time()
                         RR_WaitingQueue.append(job)
                         with beat(5):
-                            update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " "])          
+                            update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " "])          
                         RR_Running.remove(job)
                         
                 if job.get_burst_type() == "EXIT":
                     job.set_exit_time(clock)
                     RR_FinishedQueue.append(job)
                     with beat(5):
-                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", str(job.get_exit_time())])
+                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", str(job.get_exit_time())])
                     RR_Running.remove(job)
                     
                     
@@ -585,7 +585,7 @@ if __name__ == "__main__":
                     if len(RR_IO_Queue) == 0:
                         RR_IO_Queue.append(job)
                         with beat(5):
-                            update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " "])
+                            update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " "])
                         RR_WaitingQueue.remove(job)
                     else:
                         job.increment_wait_time()
@@ -593,7 +593,7 @@ if __name__ == "__main__":
                 else:
                     RR_ReadyQueue.append(job)
                     with beat(5):
-                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " ", " "])
+                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " ", " "])
                     RR_WaitingQueue.remove(job)
             
                 
@@ -603,18 +603,18 @@ if __name__ == "__main__":
                     job.get_next_burst()
                     RR_ReadyQueue.append(job)
                     with beat(5):
-                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " ", " "])
+                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " ", " "])
                     RR_IO_Queue.remove(job)
                     
                 else:
                     job.decrement_burst_time()
                     with beat(5):
-                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " "])
+                        update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " "])
                     if job.get_burst_time() == 0:
                         job.get_next_burst()
                         RR_ReadyQueue.append(job)
                         with beat(5):
-                            update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Burst: {job.get_burst_type()}", " ", " ", " ", " ", " "])
+                            update_row(table3, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} BT: {job.get_burst_type()}", " ", " ", " ", " ", " "])
                         RR_IO_Queue.remove(job)
             #endregion
             
@@ -630,7 +630,7 @@ if __name__ == "__main__":
                     if len(MLFQ_Running) < Num_CPUs:
                         MLFQ_Running.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " "])
                         MLFQ_ReadyQueue_P1.remove(job)
                     
                     else:
@@ -643,7 +643,7 @@ if __name__ == "__main__":
                     if len(MLFQ_Running) < Num_CPUs:
                         MLFQ_Running.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " "])
                         MLFQ_ReadyQueue_P2.remove(job)
                     
                     else:
@@ -652,7 +652,7 @@ if __name__ == "__main__":
                         if job.get_ML_wait_time() == 25:
                             MLFQ_ReadyQueue_P1.append(job)
                             with beat(5):
-                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                             job.reset_ML_wait_time()
                             MLFQ_ReadyQueue_P2.remove(job)
                         
@@ -663,7 +663,7 @@ if __name__ == "__main__":
                     if len(MLFQ_Running) < Num_CPUs:
                         MLFQ_Running.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " "])
                         MLFQ_ReadyQueue_P3.remove(job)
                     
                     else:
@@ -672,7 +672,7 @@ if __name__ == "__main__":
                         if job.get_ML_wait_time() == 50:
                             MLFQ_ReadyQueue_P2.append(job)
                             with beat(5):
-                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                             job.reset_ML_wait_time()
                             MLFQ_ReadyQueue_P3.remove(job)
         
@@ -680,7 +680,7 @@ if __name__ == "__main__":
                 if job.get_burst_type() == "IO":
                     MLFQ_WaitingQueue.append(job)
                     with beat(5):
-                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " "])
+                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " "])
                     MLFQ_Running.remove(job)
                     continue
                 
@@ -692,18 +692,19 @@ if __name__ == "__main__":
                                 job.reset_cpu_time()
                                 MLFQ_WaitingQueue.append(job)
                                 with beat(5):
-                                    update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " "])
+                                    update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " "])
                                 MLFQ_Running.remove(job)
                                 continue
                                 
                             else:
                                 job.decrement_burst_time()
+                                job.increment_cpu_time()
                                 if job.get_burst_time() == 0:
                                     job.get_next_burst()
                                     job.reset_cpu_time()
                                     MLFQ_WaitingQueue.append(job)
                                     with beat(5):
-                                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " "])
+                                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " "])
                                     MLFQ_Running.remove(job)
                                     continue
                         else:
@@ -711,7 +712,7 @@ if __name__ == "__main__":
                             job.set_priority(2)
                             MLFQ_WaitingQueue.append(job)
                             with beat(5):
-                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " "])
+                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " "])
                             MLFQ_Running.remove(job)
                             continue
                         
@@ -722,48 +723,57 @@ if __name__ == "__main__":
                                 job.reset_cpu_time()
                                 MLFQ_WaitingQueue.append(job)
                                 with beat(5):
-                                    update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " "])
+                                    update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " "])
                                 MLFQ_Running.remove(job)
                                 continue
                                 
                             else:
                                 job.decrement_burst_time()
+                                job.increment_cpu_time()
                                 if job.get_burst_time() == 0:
                                     job.get_next_burst()
                                     job.reset_cpu_time()
                                     MLFQ_WaitingQueue.append(job)
                                     with beat(5):
-                                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " "])
+                                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " "])
                                     MLFQ_Running.remove(job)
                                     continue
-                                
-                        elif job.get_priority() == 3:
-                            if job.cpu_time <= 16:
+                        else:
+                            job.reset_cpu_time()
+                            job.set_priority(3)
+                            MLFQ_WaitingQueue.append(job)
+                            with beat(5):
+                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " "])
+                            MLFQ_Running.remove(job)
+                            continue        
+                    elif job.get_priority() == 3:
+                        if job.cpu_time <= 16:
+                            if job.get_burst_time() == 0:
+                                job.get_next_burst()
+                                job.reset_cpu_time()
+                                MLFQ_WaitingQueue.append(job)
+                                with beat(5):
+                                    update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " "])
+                                MLFQ_Running.remove(job)
+                                continue
+                            
+                            else:
+                                job.decrement_burst_time()
+                                job.increment_cpu_time()
                                 if job.get_burst_time() == 0:
                                     job.get_next_burst()
                                     job.reset_cpu_time()
                                     MLFQ_WaitingQueue.append(job)
                                     with beat(5):
-                                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " "])
+                                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " "])
                                     MLFQ_Running.remove(job)
                                     continue
-                                
-                                else:
-                                    job.decrement_burst_time()
-                                    if job.get_burst_time() == 0:
-                                        job.get_next_burst()
-                                        job.reset_cpu_time()
-                                        MLFQ_WaitingQueue.append(job)
-                                        with beat(5):
-                                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " "])
-                                        MLFQ_Running.remove(job)
-                                        continue
                         
                 if job.get_burst_type() == "EXIT":
                     job.set_exit_time(clock)
                     MLFQ_FinishedQueue.append(job)
                     with beat(5):
-                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", str(job.get_exit_time())])
+                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", str(job.get_exit_time())])
                     MLFQ_Running.remove(job)
                     
                     
@@ -772,7 +782,7 @@ if __name__ == "__main__":
                     if len(MLFQ_IO_Queue) == 0:
                         MLFQ_IO_Queue.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " "])
                         MLFQ_WaitingQueue.remove(job)
                     else:
                         job.increment_wait_time()
@@ -781,17 +791,17 @@ if __name__ == "__main__":
                     if job.get_priority() == 1:
                         MLFQ_ReadyQueue_P1.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                         MLFQ_WaitingQueue.remove(job)
                     elif job.get_priority() == 2:
                         MLFQ_ReadyQueue_P2.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                         MLFQ_WaitingQueue.remove(job)
                     elif job.get_priority() == 3:
                         MLFQ_ReadyQueue_P3.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                         MLFQ_WaitingQueue.remove(job)
             
                 
@@ -801,35 +811,35 @@ if __name__ == "__main__":
                     if job.get_priority() == 1:
                         MLFQ_ReadyQueue_P1.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                     elif job.get_priority() == 2:
                         MLFQ_ReadyQueue_P2.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                     elif job.get_priority() == 3:
                         MLFQ_ReadyQueue_P3.append(job)
                         with beat(5):
-                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                            update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                     MLFQ_IO_Queue.remove(job)
                     
                 else:
                     job.decrement_burst_time()
                     with beat(5):
-                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " "])
+                        update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", " ", " ", " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " "])
                     if job.get_burst_time() == 0:
                         job.get_next_burst()
                         if job.get_priority() == 1:
                             MLFQ_ReadyQueue_P1.append(job)
                             with beat(5):
-                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                         elif job.get_priority() == 2:
                             MLFQ_ReadyQueue_P2.append(job)
                             with beat(5):
-                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                         elif job.get_priority() == 3:
                             MLFQ_ReadyQueue_P3.append(job)
                             with beat(5):
-                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} Priority: {job.get_priority()}", " ", " ", " ", " ", " "])
+                                update_row(table4, (job.get_id()-1), [str(job.get_arrival_time()), " ", f"J{job.get_id()} P: {job.get_priority()}", " ", " ", " ", " ", " "])
                         MLFQ_IO_Queue.remove(job)
             
             #endregion
