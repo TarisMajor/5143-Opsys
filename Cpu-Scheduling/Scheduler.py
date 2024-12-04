@@ -16,8 +16,8 @@ from rich.align import Align
 def getConfig(client_id):
     return {
         "client_id": client_id,
-        "min_jobs": 10,
-        "max_jobs": 10,
+        "min_jobs": 3,
+        "max_jobs": 3,
         "min_bursts": 3,
         "max_bursts": 3,
         "min_job_interval": 2,
